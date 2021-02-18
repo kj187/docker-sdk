@@ -49,7 +49,7 @@ function Images::_buildApp() {
         -t "${baseAppImage}" \
         -f "${DEPLOYMENT_PATH}/images/common/application/Dockerfile" \
         --progress="${PROGRESS_TYPE}" \
-        --cache-from "${DOCKER_REGISTRY}${baseAppImage}" \
+        --cache-from "${DOCKER_CACHE_FROM_PREFIX}${baseAppImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PLATFORM_IMAGE=${SPRYKER_PLATFORM_IMAGE}" \
         --build-arg "SPRYKER_LOG_DIRECTORY=${SPRYKER_LOG_DIRECTORY}" \
@@ -68,7 +68,7 @@ function Images::_buildApp() {
         "${sshArgument[@]}" \
         --secret "id=secrets-env,src=$SECRETS_FILE_PATH" \
         --progress="${PROGRESS_TYPE}" \
-        --cache-from "${DOCKER_REGISTRY}${appImage}" \
+        --cache-from "${DOCKER_CACHE_FROM_PREFIX}${appImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PARENT_IMAGE=${baseAppImage}" \
         --build-arg "SPRYKER_DOCKER_PREFIX=${SPRYKER_DOCKER_PREFIX}" \
@@ -90,7 +90,7 @@ function Images::_buildApp() {
         -t "${runtimeImage}" \
         -f "${DEPLOYMENT_PATH}/images/common/application-local/Dockerfile" \
         --progress="${PROGRESS_TYPE}" \
-        --cache-from "${DOCKER_REGISTRY}${localAppImage}" \
+        --cache-from "${DOCKER_CACHE_FROM_PREFIX}${localAppImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PARENT_IMAGE=${appImage}" \
         "${DEPLOYMENT_PATH}/context" 1>&2
@@ -111,7 +111,7 @@ function Images::_buildApp() {
         -t "${baseCliImage}" \
         -f "${DEPLOYMENT_PATH}/images/common/cli/Dockerfile" \
         --progress="${PROGRESS_TYPE}" \
-        --cache-from "${DOCKER_REGISTRY}${baseCliImage}" \
+        --cache-from "${DOCKER_CACHE_FROM_PREFIX}${baseCliImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PARENT_IMAGE=${localAppImage}" \
         "${DEPLOYMENT_PATH}/context" 1>&2
@@ -124,7 +124,7 @@ function Images::_buildApp() {
         "${sshArgument[@]}" \
         --secret "id=secrets-env,src=$SECRETS_FILE_PATH" \
         --progress="${PROGRESS_TYPE}" \
-        --cache-from "${DOCKER_REGISTRY}${cliImage}" \
+        --cache-from "${DOCKER_CACHE_FROM_PREFIX}${cliImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PARENT_IMAGE=${baseCliImage}" \
         --build-arg "DEPLOYMENT_PATH=${DEPLOYMENT_PATH}" \
@@ -161,7 +161,7 @@ function Images::_buildFrontend() {
         -t "${baseFrontendImage}" \
         -f "${DEPLOYMENT_PATH}/images/common/frontend/Dockerfile" \
         --progress="${PROGRESS_TYPE}" \
-        --cache-from "${DOCKER_REGISTRY}${baseFrontendImage}" \
+        --cache-from "${DOCKER_CACHE_FROM_PREFIX}${baseFrontendImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_FRONTEND_IMAGE=${SPRYKER_FRONTEND_IMAGE}" \
         --build-arg "SPRYKER_BUILD_HASH=${SPRYKER_BUILD_HASH:-"current"}" \
@@ -174,7 +174,7 @@ function Images::_buildFrontend() {
         -t "${runtimeFrontendImage}" \
         -f "${DEPLOYMENT_PATH}/images/${folder}/frontend/Dockerfile" \
         --progress="${PROGRESS_TYPE}" \
-        --cache-from "${DOCKER_REGISTRY}${frontendImage}" \
+        --cache-from "${DOCKER_CACHE_FROM_PREFIX}${frontendImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PARENT_IMAGE=${baseFrontendImage}" \
         --build-arg "SPRYKER_ASSETS_BUILDER_IMAGE=${builderAssetsImage}" \
@@ -201,7 +201,7 @@ function Images::_buildGateway() {
         -t "${gatewayImage}" \
         -f "${DEPLOYMENT_PATH}/images/common/gateway/Dockerfile" \
         --progress="${PROGRESS_TYPE}" \
-        --cache-from "${DOCKER_REGISTRY}${gatewayImage}" \
+        --cache-from "${DOCKER_CACHE_FROM_PREFIX}${gatewayImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --build-arg "BUILDKIT_INLINE_CACHE=1" \
         "${DEPLOYMENT_PATH}/context" 1>&2
 }
