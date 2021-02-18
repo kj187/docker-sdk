@@ -44,10 +44,13 @@ function Images::_buildApp() {
 
     Console::verbose "${INFO}Building Application images${NC}"
 
+    Console::verbose "${INFO}> Building '${baseAppImage}' image${NC}"
     docker build \
         -t "${baseAppImage}" \
         -f "${DEPLOYMENT_PATH}/images/common/application/Dockerfile" \
         --progress="${PROGRESS_TYPE}" \
+        --cache-from "${DOCKER_REGISTRY}${baseAppImage}" \
+        --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PLATFORM_IMAGE=${SPRYKER_PLATFORM_IMAGE}" \
         --build-arg "SPRYKER_LOG_DIRECTORY=${SPRYKER_LOG_DIRECTORY}" \
         --build-arg "SPRYKER_PIPELINE=${SPRYKER_PIPELINE}" \
@@ -58,12 +61,15 @@ function Images::_buildApp() {
         --build-arg "SPRYKER_BUILD_STAMP=${SPRYKER_BUILD_STAMP:-""}" \
         "${DEPLOYMENT_PATH}/context" 1>&2
 
+    Console::verbose "${INFO}> Building '${appImage}' image${NC}"
     docker build \
         -t "${appImage}" \
         -f "${DEPLOYMENT_PATH}/images/${folder}/application/Dockerfile" \
         "${sshArgument[@]}" \
         --secret "id=secrets-env,src=$SECRETS_FILE_PATH" \
         --progress="${PROGRESS_TYPE}" \
+        --cache-from "${DOCKER_REGISTRY}${appImage}" \
+        --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PARENT_IMAGE=${baseAppImage}" \
         --build-arg "SPRYKER_DOCKER_PREFIX=${SPRYKER_DOCKER_PREFIX}" \
         --build-arg "SPRYKER_DOCKER_TAG=${SPRYKER_DOCKER_TAG}" \
@@ -78,11 +84,14 @@ function Images::_buildApp() {
         --build-arg "SPRYKER_BUILD_STAMP=${SPRYKER_BUILD_STAMP:-""}" \
         . 1>&2
 
+    Console::verbose "${INFO}> Building '${localAppImage}' image${NC}"
     docker build \
         -t "${localAppImage}" \
         -t "${runtimeImage}" \
         -f "${DEPLOYMENT_PATH}/images/common/application-local/Dockerfile" \
         --progress="${PROGRESS_TYPE}" \
+        --cache-from "${DOCKER_REGISTRY}${localAppImage}" \
+        --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PARENT_IMAGE=${appImage}" \
         "${DEPLOYMENT_PATH}/context" 1>&2
 
@@ -97,13 +106,17 @@ function Images::_buildApp() {
 
     Console::verbose "${INFO}Building CLI images${NC}"
 
+    Console::verbose "${INFO}> Building '${baseCliImage}' image${NC}"
     docker build \
         -t "${baseCliImage}" \
         -f "${DEPLOYMENT_PATH}/images/common/cli/Dockerfile" \
         --progress="${PROGRESS_TYPE}" \
+        --cache-from "${DOCKER_REGISTRY}${baseCliImage}" \
+        --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PARENT_IMAGE=${localAppImage}" \
         "${DEPLOYMENT_PATH}/context" 1>&2
 
+    Console::verbose "${INFO}> Building '${cliImage}' image${NC}"
     docker build \
         -t "${cliImage}" \
         -t "${runtimeCliImage}" \
@@ -111,6 +124,8 @@ function Images::_buildApp() {
         "${sshArgument[@]}" \
         --secret "id=secrets-env,src=$SECRETS_FILE_PATH" \
         --progress="${PROGRESS_TYPE}" \
+        --cache-from "${DOCKER_REGISTRY}${cliImage}" \
+        --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PARENT_IMAGE=${baseCliImage}" \
         --build-arg "DEPLOYMENT_PATH=${DEPLOYMENT_PATH}" \
         --build-arg "SPRYKER_PIPELINE=${SPRYKER_PIPELINE}" \
@@ -119,6 +134,7 @@ function Images::_buildApp() {
         .  1>&2
 
     if [ -n "${SPRYKER_XDEBUG_MODE_ENABLE}" ]; then
+        Console::verbose "${INFO}> Building '${runtimeCliImage}' image${NC}"
         docker build \
             -t "${runtimeCliImage}" \
             -f "${DEPLOYMENT_PATH}/images/debug/cli/Dockerfile" \
@@ -140,25 +156,32 @@ function Images::_buildFrontend() {
 
     Console::verbose "${INFO}Building Frontend images${NC}"
 
+    Console::verbose "${INFO}> Building '${baseFrontendImage}' image${NC}"
     docker build \
         -t "${baseFrontendImage}" \
         -f "${DEPLOYMENT_PATH}/images/common/frontend/Dockerfile" \
         --progress="${PROGRESS_TYPE}" \
+        --cache-from "${DOCKER_REGISTRY}${baseFrontendImage}" \
+        --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_FRONTEND_IMAGE=${SPRYKER_FRONTEND_IMAGE}" \
         --build-arg "SPRYKER_BUILD_HASH=${SPRYKER_BUILD_HASH:-"current"}" \
         --build-arg "SPRYKER_BUILD_STAMP=${SPRYKER_BUILD_STAMP:-""}" \
         "${DEPLOYMENT_PATH}/context" 1>&2
 
+    Console::verbose "${INFO}> Building '${frontendImage}' image${NC}"
     docker build \
         -t "${frontendImage}" \
         -t "${runtimeFrontendImage}" \
         -f "${DEPLOYMENT_PATH}/images/${folder}/frontend/Dockerfile" \
         --progress="${PROGRESS_TYPE}" \
+        --cache-from "${DOCKER_REGISTRY}${frontendImage}" \
+        --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PARENT_IMAGE=${baseFrontendImage}" \
         --build-arg "SPRYKER_ASSETS_BUILDER_IMAGE=${builderAssetsImage}" \
         "${DEPLOYMENT_PATH}/context" 1>&2
 
     if [ -n "${SPRYKER_XDEBUG_MODE_ENABLE}" ]; then
+        Console::verbose "${INFO}> Building '${runtimeFrontendImage}' image${NC}"
         docker build \
             -t "${runtimeFrontendImage}" \
             -f "${DEPLOYMENT_PATH}/images/debug/frontend/Dockerfile" \
@@ -173,10 +196,13 @@ function Images::_buildGateway() {
 
     Console::verbose "${INFO}Building Gateway image${NC}"
 
+    Console::verbose "${INFO}> Building '${gatewayImage}' image${NC}"
     docker build \
         -t "${gatewayImage}" \
         -f "${DEPLOYMENT_PATH}/images/common/gateway/Dockerfile" \
         --progress="${PROGRESS_TYPE}" \
+        --cache-from "${DOCKER_REGISTRY}${gatewayImage}" \
+        --build-arg "BUILDKIT_INLINE_CACHE=1" \
         "${DEPLOYMENT_PATH}/context" 1>&2
 }
 
@@ -187,10 +213,12 @@ function Images::_tagByApp() {
     local applicationPrefix="$(echo "$applicationName" | tr '[:upper:]' '[:lower:]')"
     local tag="${imageName}-${applicationPrefix}"
 
+    Console::verbose "${INFO}> Tag image '${baseImageName}'       '${tag}'${NC}"
     docker tag "${baseImageName}" "${tag}"
 }
 
 function Images::tagApplications() {
+    Console::verbose "${INFO}> Tag applications${NC}"
     local tag=${1:-${SPRYKER_DOCKER_TAG}}
 
     for application in "${SPRYKER_APPLICATIONS[@]}"; do
@@ -200,12 +228,14 @@ function Images::tagApplications() {
 }
 
 function Images::tagFrontend() {
+    Console::verbose "${INFO}> Tag frontend${NC}"
     local tag=${1:-${SPRYKER_DOCKER_TAG}}
 
     Images::_tagByApp frontend "${SPRYKER_DOCKER_PREFIX}_frontend:${tag}" "${SPRYKER_DOCKER_PREFIX}_frontend:${SPRYKER_DOCKER_TAG}"
 }
 
 function Images::printAll() {
+    Console::verbose "${INFO}> Print all images${NC}"
     local tag=${1:-${SPRYKER_DOCKER_TAG}}
 
     for application in "${SPRYKER_APPLICATIONS[@]}"; do

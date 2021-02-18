@@ -41,6 +41,7 @@ RUN --mount=type=cache,id=composer,sharing=locked,target=/home/spryker/.composer
 
 FROM application-production-codebase AS application-production
 
+COPY --chown=spryker:spryker bin ${srcRoot}/bin
 COPY --chown=spryker:spryker public ${srcRoot}/public
 COPY --chown=spryker:spryker frontend ${srcRoot}/frontend
 COPY --chown=spryker:spryker .yarn* ${srcRoot}/.yarn

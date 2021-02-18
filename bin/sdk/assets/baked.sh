@@ -68,6 +68,7 @@ function Assets::areBuilt() {
 }
 
 function Assets::build() {
+    Console::verbose "${INFO}Assets build${NC}"
 
     local force=''
     if [ "$1" == '--force' ]; then
@@ -92,6 +93,7 @@ function Assets::build() {
     local cliImage="${SPRYKER_DOCKER_PREFIX}_cli:${SPRYKER_DOCKER_TAG}"
     local mode=${SPRYKER_ASSETS_MODE:-development}
 
+    Console::verbose "${INFO}Build image '${builderAssetsImage}'${NC}"
     docker build \
         -t "${builderAssetsImage}" \
         -f "${DEPLOYMENT_PATH}/images/baked/assets/Dockerfile" \
