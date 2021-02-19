@@ -98,8 +98,6 @@ function Assets::build() {
         -t "${builderAssetsImage}" \
         -f "${DEPLOYMENT_PATH}/images/baked/assets/Dockerfile" \
         --progress="${PROGRESS_TYPE}" \
-        --cache-from "${DOCKER_CACHE_FROM_PREFIX}${cliImage/${SPRYKER_DOCKER_TAG}/latest}" \
-        --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PARENT_IMAGE=${cliImage}" \
         --build-arg "SPRYKER_ASSETS_MODE=${mode}" \
         --build-arg "SPRYKER_PIPELINE=${SPRYKER_PIPELINE}" \
