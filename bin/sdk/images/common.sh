@@ -68,6 +68,7 @@ function Images::_buildApp() {
         "${sshArgument[@]}" \
         --secret "id=secrets-env,src=$SECRETS_FILE_PATH" \
         --progress="${PROGRESS_TYPE}" \
+        --cache-from "${DOCKER_CACHE_FROM_PREFIX}${baseAppImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --cache-from "${DOCKER_CACHE_FROM_PREFIX}${appImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PARENT_IMAGE=${baseAppImage}" \
@@ -90,6 +91,7 @@ function Images::_buildApp() {
         -t "${runtimeImage}" \
         -f "${DEPLOYMENT_PATH}/images/common/application-local/Dockerfile" \
         --progress="${PROGRESS_TYPE}" \
+        --cache-from "${DOCKER_CACHE_FROM_PREFIX}${appImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --cache-from "${DOCKER_CACHE_FROM_PREFIX}${localAppImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PARENT_IMAGE=${appImage}" \
@@ -111,6 +113,7 @@ function Images::_buildApp() {
         -t "${baseCliImage}" \
         -f "${DEPLOYMENT_PATH}/images/common/cli/Dockerfile" \
         --progress="${PROGRESS_TYPE}" \
+        --cache-from "${DOCKER_CACHE_FROM_PREFIX}${localAppImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --cache-from "${DOCKER_CACHE_FROM_PREFIX}${baseCliImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PARENT_IMAGE=${localAppImage}" \
@@ -124,6 +127,7 @@ function Images::_buildApp() {
         "${sshArgument[@]}" \
         --secret "id=secrets-env,src=$SECRETS_FILE_PATH" \
         --progress="${PROGRESS_TYPE}" \
+        --cache-from "${DOCKER_CACHE_FROM_PREFIX}${baseCliImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --cache-from "${DOCKER_CACHE_FROM_PREFIX}${cliImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PARENT_IMAGE=${baseCliImage}" \
@@ -174,6 +178,7 @@ function Images::_buildFrontend() {
         -t "${runtimeFrontendImage}" \
         -f "${DEPLOYMENT_PATH}/images/${folder}/frontend/Dockerfile" \
         --progress="${PROGRESS_TYPE}" \
+        --cache-from "${DOCKER_CACHE_FROM_PREFIX}${baseFrontendImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --cache-from "${DOCKER_CACHE_FROM_PREFIX}${frontendImage/${SPRYKER_DOCKER_TAG}/latest}" \
         --build-arg "BUILDKIT_INLINE_CACHE=1" \
         --build-arg "SPRYKER_PARENT_IMAGE=${baseFrontendImage}" \
